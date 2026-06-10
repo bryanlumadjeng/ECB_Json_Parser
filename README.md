@@ -5,20 +5,38 @@ Transposes each paragraph of the [ECB supervisory guide](https://www.bankingsupe
 
 ## Setup
 
+No installation is required — the parser runs on the Python standard
+library alone (Python 3.10+). A bundled, dependency-free PDF reader
+(`pdf_extract.py`) handles cross-reference streams, compressed object
+streams, FlateDecode (with PNG/TIFF predictors) and Type0/CID fonts with
+ToUnicode CMaps.
+
+Two optional extras improve convenience, not correctness:
+
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt   # optional
 ```
+
+- **PyMuPDF** — if installed, it is used for higher-fidelity layout; if
+  absent, the bundled extractor is used automatically.
+- **requests** — only needed to download via `--url`. With a local file
+  (`--pdf`) nothing extra is required.
 
 ## Usage
 
 ```bash
-# Download the guide and write supervisory_guide_paragraphs.json
+# Parse a local copy (no dependencies needed)
+python ecb_pdf_to_json.py --pdf ssm.supervisory_guide202507.en.pdf
+
+# Download the guide and parse it (needs requests + network access)
 python ecb_pdf_to_json.py
 
-# Or parse a local copy / a different ECB publication
-python ecb_pdf_to_json.py --pdf ssm.supervisory_guide202507.en.pdf
+# Different publication / custom output path
 python ecb_pdf_to_json.py --url https://... -o out.json
 ```
+
+The committed `supervisory_guide_paragraphs.json` is the result of running
+the parser over the July 2025 guide (2,350 paragraphs).
 
 ## Output format
 
@@ -51,8 +69,9 @@ python ecb_pdf_to_json.py --url https://... -o out.json
 
 ## How it works
 
-`ecb_pdf_to_json.py` extracts layout blocks with PyMuPDF (text, page, font
-size, boldness, vertical position), then:
+`ecb_pdf_to_json.py` extracts layout blocks (text, page, font size,
+boldness, vertical position) — via `pdf_extract.py` by default, or PyMuPDF
+if installed — then:
 
 1. determines the body font size (most common size, weighted by text length);
 2. drops page furniture (text repeated on many pages, bare page numbers) and

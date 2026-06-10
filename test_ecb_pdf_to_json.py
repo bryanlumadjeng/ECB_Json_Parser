@@ -127,5 +127,52 @@ class SegmentationTest(unittest.TestCase):
         self.assertIn("text", record)
 
 
+class PdfExtractLogicTest(unittest.TestCase):
+    """Pure-logic tests for the standard-library PDF extractor that do not
+    require an actual PDF file."""
+
+    def test_parse_tounicode_bfchar_and_bfrange(self):
+        import pdf_extract
+
+        cmap = (
+            b"begincodespacerange <0000> <FFFF> endcodespacerange\n"
+            b"beginbfchar <0003> <0041> endbfchar\n"
+            b"beginbfrange <0010> <0012> <0061> endbfrange\n"
+        )
+        mapping, two_byte = pdf_extract.parse_tounicode(cmap)
+        self.assertTrue(two_byte)
+        self.assertEqual(mapping[0x03], "A")
+        self.assertEqual(mapping[0x10], "a")
+        self.assertEqual(mapping[0x12], "c")
+
+    def test_png_up_predictor_roundtrip(self):
+        import pdf_extract
+
+        # two rows, 3 bytes each, PNG "Up" filter (type 2) on second row
+        raw = bytes([0, 10, 20, 30, 2, 1, 2, 3])
+        out = pdf_extract.apply_predictor(raw, 12, 1, 8, 3)
+        self.assertEqual(out, bytes([10, 20, 30, 11, 22, 33]))
+
+    def test_font_decode_two_byte_via_tounicode(self):
+        import pdf_extract
+
+        font = pdf_extract.Font(two_byte=True, tounicode={3: "A", 4: "B"}, bold=False)
+        self.assertEqual(font.decode(b"\x00\x03\x00\x04"), "AB")
+
+    def test_group_lines_clusters_by_y(self):
+        import pdf_extract
+        from pdf_extract import Fragment
+
+        frags = [
+            Fragment(1, 100.0, 50.0, 10.0, False, "Hello "),
+            Fragment(1, 140.0, 50.4, 10.0, False, "world"),
+            Fragment(1, 100.0, 64.0, 10.0, False, "next line"),
+        ]
+        lines = pdf_extract.group_lines(frags)
+        self.assertEqual(len(lines), 2)
+        self.assertEqual(lines[0]["text"], "Hello world")
+        self.assertEqual(lines[1]["text"], "next line")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -122,8 +122,16 @@ def download_pdf(url: str, dest: Path) -> Path:
 
 
 def extract_blocks(pdf_path: Path) -> list[Block]:
-    """Read the PDF and return one Block per visual text block."""
-    import fitz  # PyMuPDF
+    """Read the PDF and return one Block per visual text block.
+
+    Uses PyMuPDF when it is installed (best layout fidelity); otherwise falls
+    back to the bundled standard-library extractor in ``pdf_extract``.
+    """
+    try:
+        import fitz  # PyMuPDF
+    except ImportError:
+        import pdf_extract
+        return [Block(**d) for d in pdf_extract.extract_blocks(pdf_path)]
 
     blocks: list[Block] = []
     with fitz.open(pdf_path) as doc:
@@ -215,14 +223,19 @@ def is_heading(block: Block, body_size: float) -> bool:
 
 
 def continues_previous(prev: Paragraph, block: Block) -> bool:
-    """A block continues the previous paragraph if the paragraph did not end
-    a sentence and the block does not start a new numbered paragraph."""
+    """A block continues the previous paragraph unless it starts a new
+    numbered paragraph. A block is a continuation when either the previous
+    block did not end a sentence (it was interrupted by a page break or an
+    inline footnote marker) or the block itself opens with a continuation
+    token (lowercase word, joining punctuation, or a dangling hyphen)."""
     if PARA_NUMBER_RE.match(block.text):
         return False
-    if prev.text.endswith(SENTENCE_END):
-        return False
+    if prev.text.endswith("-"):
+        return True
     first = block.text[:1]
-    return first.islower() or first in ",;)–-”" or prev.text.endswith("-")
+    if first.islower() or first in ",;:)–—-”’":
+        return True
+    return not prev.text.rstrip().endswith(SENTENCE_END)
 
 
 def segment_paragraphs(blocks: list[Block]) -> list[Paragraph]:

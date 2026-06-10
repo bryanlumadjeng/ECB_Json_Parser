@@ -1,2 +1,5 @@
-pymupdf>=1.24
-requests>=2.31
+# The parser runs with the Python standard library only — no install needed.
+# PyMuPDF is OPTIONAL: if present it is used for higher-fidelity layout,
+# otherwise the bundled pure-stdlib extractor (pdf_extract.py) is used.
+# pymupdf>=1.24   # optional
+# requests>=2.31  # optional, only needed for --url downloading
