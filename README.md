@@ -38,6 +38,14 @@ python ecb_pdf_to_json.py --url https://... -o out.json
 The committed `supervisory_guide_paragraphs.json` is the result of running
 the parser over the July 2025 guide (2,350 paragraphs).
 
+### Run it in Google Colab
+
+Open `ecb_pdf_to_json_colab.ipynb` in [Google Colab](https://colab.research.google.com/)
+(`File → Open notebook → GitHub`, or upload the `.ipynb`). Then
+`Runtime → Run all`: it clones this repo (which bundles the parser and the
+PDF), runs the parser, previews the paragraphs as a table, and downloads the
+JSON. No local setup needed.
+
 ## Output format
 
 ```json
