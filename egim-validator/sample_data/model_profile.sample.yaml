@@ -1,0 +1,4 @@
+model_name: Retail Mortgage PD Model
+model_type: credit_risk
+portfolio: Retail mortgages, domestic
+notes: IRB PD model; annual recalibration; this engagement covers the 2026 periodic validation.

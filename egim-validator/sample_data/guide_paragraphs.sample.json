@@ -1,0 +1,60 @@
+{
+  "source": "sample (mimics ecb_pdf_to_json.py output)",
+  "paragraph_count": 6,
+  "paragraphs": [
+    {
+      "id": 1,
+      "paragraph_number": null,
+      "chapter": "1 General topics",
+      "section": "1.1 Overarching principles for internal models",
+      "page_start": 4,
+      "page_end": 4,
+      "text": "This chapter sets out the ECB's understanding of the general requirements applicable to internal models."
+    },
+    {
+      "id": 2,
+      "paragraph_number": "12",
+      "chapter": "1 General topics",
+      "section": "1.2 Model governance",
+      "page_start": 9,
+      "page_end": 9,
+      "text": "Institutions should have a sound model governance framework in place, including a model inventory that covers all internal models, clearly assigned responsibilities for model development and validation, and documented approval processes for new models and model changes."
+    },
+    {
+      "id": 3,
+      "paragraph_number": "13",
+      "chapter": "1 General topics",
+      "section": "1.3 Internal validation",
+      "page_start": 11,
+      "page_end": 11,
+      "text": "The internal validation function should be independent from the model development function. Institutions should document the scope, frequency and outcomes of the validation activities, and validation findings should be reported to senior management."
+    },
+    {
+      "id": 4,
+      "paragraph_number": "45",
+      "chapter": "2 Credit risk",
+      "section": "2.4 Probability of default",
+      "page_start": 58,
+      "page_end": 58,
+      "text": "For the purposes of PD estimation, institutions should use a long-run average default rate that is representative of the likely range of variability of default rates, and should document the rationale for the chosen historical observation period."
+    },
+    {
+      "id": 5,
+      "paragraph_number": "46",
+      "chapter": "2 Credit risk",
+      "section": "2.4 Probability of default",
+      "page_start": 59,
+      "page_end": 59,
+      "text": "Institutions should apply an appropriate margin of conservatism to PD estimates to account for the expected range of estimation errors, and should document the quantification of this margin."
+    },
+    {
+      "id": 6,
+      "paragraph_number": "201",
+      "chapter": "3 Market risk",
+      "section": "3.2 Scope of the internal model approach",
+      "page_start": 130,
+      "page_end": 130,
+      "text": "Institutions using the internal model approach for market risk should document the scope of positions covered by the model and the treatment of positions excluded from it."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "title": "Retail Mortgage PD Model — Model Documentation v2.3",
+  "sections": [
+    {
+      "id": "GOV-1",
+      "heading": "Model governance and approval",
+      "text": "The model is registered in the group model inventory under ID RM-PD-017. Responsibilities for model development are assigned to the Retail Credit Modelling team, while independent validation is performed by the Model Risk Management department. New models and material model changes are approved by the Model Risk Committee following the group model lifecycle policy."
+    },
+    {
+      "id": "VAL-1",
+      "heading": "Independent validation",
+      "text": "Validation of the model is performed annually by Model Risk Management, which is organisationally separate from model development and reports directly to the CRO. The validation scope covers discriminatory power, calibration accuracy and stability. Validation outcomes and findings are reported to senior management through the quarterly Model Risk Report."
+    },
+    {
+      "id": "PD-1",
+      "heading": "Long-run average default rate",
+      "text": "The PD calibration target is the long-run average default rate computed over the 2007-2023 observation period, which includes two economic downturns and is considered representative of the likely range of variability of default rates. The rationale for the chosen historical observation period is documented in Annex C."
+    },
+    {
+      "id": "PD-2",
+      "heading": "Calibration approach",
+      "text": "Grade-level PDs are calibrated to the long-run average via a logistic master scale. Calibration tests are performed annually."
+    }
+  ]
+}
