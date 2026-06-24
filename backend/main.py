@@ -59,6 +59,21 @@ async def health() -> dict:
     return {"status": "ok", "ecb_corpus": _ECB_JSON.exists()}
 
 
+@app.get("/api/chapters")
+async def get_chapters(scope: str = "all") -> dict:
+    corpus = _get_corpus()
+    valid_scopes = {"all", "credit_risk", "market_risk_crr2", "market_risk_crr3", "ccr"}
+    if scope not in valid_scopes:
+        scope = "all"
+    chapters = corpus.chapters if scope == "all" else corpus.filter_by_scope([scope])
+    return {
+        "chapters": [
+            {"id": ch.chapter, "display_name": ch.display_name, "zone": ch.zone}
+            for ch in chapters
+        ]
+    }
+
+
 @app.post("/api/evaluate")
 async def evaluate(
     file: UploadFile = File(...),
@@ -67,6 +82,7 @@ async def evaluate(
     top_k: int = Form(default=6),
     chunk_size: int = Form(default=2000),
     overlap: int = Form(default=200),
+    selected_chapters: str = Form(default=""),
 ) -> dict:
     # Validate inputs
     valid_scopes = {"auto", "all", "credit_risk", "market_risk_crr2", "market_risk_crr3", "ccr"}
@@ -106,6 +122,10 @@ async def evaluate(
     chapters = corpus.filter_by_scope(scope_tags)
     if max_chapters and max_chapters > 0:
         chapters = chapters[:max_chapters]
+
+    if selected_chapters.strip():
+        allowed = {c.strip() for c in selected_chapters.split(",") if c.strip()}
+        chapters = [ch for ch in chapters if ch.chapter in allowed]
 
     if not chapters:
         raise HTTPException(status_code=422, detail="No relevant ECB chapters found for the detected scope")
