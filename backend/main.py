@@ -5,8 +5,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Ensure project root is on the path so ecb_pdf_to_json can be imported
 _ROOT = Path(__file__).parent.parent
@@ -45,6 +46,11 @@ def _get_corpus() -> EcbCorpus:
             )
         _corpus = EcbCorpus(_ECB_JSON)
     return _corpus
+
+
+@app.exception_handler(Exception)
+async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 
 @app.get("/api/health")

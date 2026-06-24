@@ -22,10 +22,17 @@ export default function Home() {
         body: formData,
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text.trim() || `Server error ${res.status}`);
+      }
 
       if (!res.ok) {
-        throw new Error(data.error ?? data.detail ?? `Server error ${res.status}`);
+        throw new Error(data?.error ?? data?.detail ?? `Server error ${res.status}`);
       }
 
       setReport(data);
