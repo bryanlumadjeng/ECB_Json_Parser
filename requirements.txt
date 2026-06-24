@@ -1,5 +1,10 @@
-# The parser runs with the Python standard library only — no install needed.
-# PyMuPDF is OPTIONAL: if present it is used for higher-fidelity layout,
-# otherwise the bundled pure-stdlib extractor (pdf_extract.py) is used.
-# pymupdf>=1.24   # optional
-# requests>=2.31  # optional, only needed for --url downloading
+# Root requirements.txt — used by Vercel's Python runtime for api/ serverless functions.
+# For local backend development see backend/requirements.txt instead.
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+anthropic>=0.35.0
+mangum>=0.17.0
+
+# PyMuPDF is OPTIONAL: if present it is used for higher-fidelity PDF layout.
+# pymupdf>=1.24
