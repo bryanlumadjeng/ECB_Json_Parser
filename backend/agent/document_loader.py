@@ -52,7 +52,19 @@ def load_document(path: Path) -> str:
         blocks = extract_blocks(path)
         paragraphs = segment_paragraphs(blocks)
         return "\n\n".join(p.text for p in paragraphs)
-    raise ValueError(f"Unsupported file type: {suffix!r}. Use .pdf or .txt")
+    if suffix == ".xlsx":
+        from openpyxl import load_workbook
+        wb = load_workbook(path, read_only=True, data_only=True)
+        parts: list[str] = []
+        for ws in wb.worksheets:
+            parts.append(f"=== Sheet: {ws.title} ===")
+            for row in ws.iter_rows(values_only=True):
+                line = "  ".join(str(c) for c in row if c is not None)
+                if line.strip():
+                    parts.append(line)
+        wb.close()
+        return "\n".join(parts)
+    raise ValueError(f"Unsupported file type: {suffix!r}. Use .pdf, .txt, or .xlsx")
 
 
 def chunk_text(

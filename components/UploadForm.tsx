@@ -38,12 +38,12 @@ export default function UploadForm({ onSubmit, loading }: Props) {
     <form onSubmit={handleSubmit} style={styles.form}>
       <h2 style={styles.heading}>Upload Model Documentation</h2>
       <p style={styles.hint}>
-        Upload a PDF or text file containing your bank&apos;s internal model documentation.
+        Upload a PDF, text, or Excel file containing your bank&apos;s internal model documentation.
         The agent will evaluate it against the ECB Supervisory Guide for Internal Models (July 2025).
       </p>
 
       <div style={styles.field}>
-        <label style={styles.label}>Document (PDF or TXT)</label>
+        <label style={styles.label}>Document (PDF, TXT, or XLSX)</label>
         <div
           style={{ ...styles.dropzone, ...(file ? styles.dropzoneActive : {}) }}
           onClick={() => fileRef.current?.click()}
@@ -56,7 +56,7 @@ export default function UploadForm({ onSubmit, loading }: Props) {
           <input
             ref={fileRef}
             type="file"
-            accept=".pdf,.txt"
+            accept=".pdf,.txt,.xlsx"
             style={{ display: "none" }}
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />

@@ -67,8 +67,8 @@ async def evaluate(
         raise HTTPException(status_code=400, detail=f"Invalid scope. Must be one of: {valid_scopes}")
 
     suffix = Path(file.filename or "upload.txt").suffix.lower()
-    if suffix not in {".pdf", ".txt"}:
-        raise HTTPException(status_code=400, detail="Only .pdf and .txt files are supported")
+    if suffix not in {".pdf", ".txt", ".xlsx"}:
+        raise HTTPException(status_code=400, detail="Only .pdf, .txt, and .xlsx files are supported")
 
     # Save upload to a temp file
     content = await file.read()

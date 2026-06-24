@@ -5,6 +5,7 @@ uvicorn[standard]>=0.30.0
 python-multipart>=0.0.9
 anthropic>=0.35.0
 mangum>=0.17.0
+openpyxl>=3.1.0
 
 # PyMuPDF is OPTIONAL: if present it is used for higher-fidelity PDF layout.
 # pymupdf>=1.24
