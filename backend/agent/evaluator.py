@@ -80,7 +80,6 @@ class Evaluator:
         api_key: str | None = None,
         model: str = DEFAULT_MODEL,
         max_retries: int = 3,
-        inter_call_delay: float = 0.5,
     ) -> None:
         self._client = anthropic.AsyncAnthropic(
             api_key=api_key or os.environ["ANTHROPIC_API_KEY"],
@@ -88,7 +87,6 @@ class Evaluator:
         )
         self._model = model
         self._max_retries = max_retries
-        self._inter_call_delay = inter_call_delay
         self._total_input = 0
         self._total_output = 0
 
@@ -141,15 +139,13 @@ class Evaluator:
             try:
                 msg = await self._client.messages.create(
                     model=self._model,
-                    max_tokens=1024,
+                    max_tokens=600,
                     system=SYSTEM_PROMPT,
                     messages=[{"role": "user", "content": user_prompt}],
                 )
                 content = msg.content[0].text
                 in_tok = msg.usage.input_tokens
                 out_tok = msg.usage.output_tokens
-                if self._inter_call_delay > 0:
-                    await asyncio.sleep(self._inter_call_delay)
                 return content, in_tok, out_tok
             except anthropic.RateLimitError as exc:
                 last_exc = exc

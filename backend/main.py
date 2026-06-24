@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 import tempfile
@@ -122,10 +123,13 @@ async def evaluate(
         )
 
     evaluator = Evaluator(api_key=api_key)
-    results = []
-    for chapter in chapters:
-        result = await evaluator.evaluate_chapter(chapter, bank_index, chunks, top_k=top_k)
-        results.append(result)
+    sem = asyncio.Semaphore(10)  # max 10 concurrent Anthropic calls
+
+    async def _eval_one(ch):
+        async with sem:
+            return await evaluator.evaluate_chapter(ch, bank_index, chunks, top_k=top_k)
+
+    results = list(await asyncio.gather(*[_eval_one(ch) for ch in chapters]))
 
     total_input, total_output = evaluator.total_tokens
     all_chapters = corpus.chapters
