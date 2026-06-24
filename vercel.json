@@ -1,7 +1,8 @@
 {
   "framework": "nextjs",
   "functions": {
-    "api/evaluate.py": { "maxDuration": 60 },
-    "api/health.py": { "maxDuration": 10 }
+    "api/evaluate.py":  { "maxDuration": 60 },
+    "api/health.py":    { "maxDuration": 10 },
+    "api/chapters.py":  { "maxDuration": 10 }
   }
 }
