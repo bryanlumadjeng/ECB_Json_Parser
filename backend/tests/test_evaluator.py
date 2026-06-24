@@ -10,10 +10,9 @@ from backend.agent.evaluator import Evaluator
 
 class TestParseVerdict(unittest.TestCase):
     def _evaluator(self):
-        # endpoint/key not needed for unit-testing _parse_verdict
+        # Only _parse_verdict is tested here; no real API client needed
         e = object.__new__(Evaluator)
-        e._endpoint = "http://fake"
-        e._api_key = "fake"
+        e._model = "claude-sonnet-4-6"
         e._max_retries = 1
         e._inter_call_delay = 0
         e._total_input = 0

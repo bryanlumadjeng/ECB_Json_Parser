@@ -107,16 +107,15 @@ async def evaluate(
     bank_index = BM25Index()
     bank_index.add_documents([c.text for c in chunks])
 
-    # Ensure Copilot Studio credentials are present
-    endpoint = os.environ.get("COPILOT_ENDPOINT")
-    api_key = os.environ.get("COPILOT_API_KEY")
-    if not endpoint or not api_key:
+    # Ensure Anthropic API key is present
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
         raise HTTPException(
             status_code=503,
-            detail="COPILOT_ENDPOINT and COPILOT_API_KEY environment variables must be set",
+            detail="ANTHROPIC_API_KEY environment variable must be set",
         )
 
-    evaluator = Evaluator(endpoint=endpoint, api_key=api_key)
+    evaluator = Evaluator(api_key=api_key)
     results = []
     for chapter in chapters:
         result = await evaluator.evaluate_chapter(chapter, bank_index, chunks, top_k=top_k)

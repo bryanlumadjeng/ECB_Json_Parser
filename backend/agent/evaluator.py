@@ -4,10 +4,9 @@ import asyncio
 import json
 import os
 import re
-import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-import httpx
+import anthropic
 
 from backend.agent.bm25_index import BM25Index
 from backend.agent.document_loader import Chunk
@@ -72,16 +71,22 @@ class EvaluationResult:
     output_tokens: int = 0
 
 
+DEFAULT_MODEL = "claude-sonnet-4-6"
+
+
 class Evaluator:
     def __init__(
         self,
-        endpoint: str | None = None,
         api_key: str | None = None,
+        model: str = DEFAULT_MODEL,
         max_retries: int = 3,
         inter_call_delay: float = 0.5,
     ) -> None:
-        self._endpoint = endpoint or os.environ["COPILOT_ENDPOINT"]
-        self._api_key = api_key or os.environ["COPILOT_API_KEY"]
+        self._client = anthropic.AsyncAnthropic(
+            api_key=api_key or os.environ["ANTHROPIC_API_KEY"],
+            max_retries=0,  # we handle retries ourselves
+        )
+        self._model = model
         self._max_retries = max_retries
         self._inter_call_delay = inter_call_delay
         self._total_input = 0
@@ -131,45 +136,30 @@ class Evaluator:
         )
 
     async def _call_api(self, user_prompt: str) -> tuple[str, int, int]:
-        payload = {
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
-            ],
-            "temperature": 0,
-        }
-
         last_exc: Exception | None = None
         for attempt in range(self._max_retries):
             try:
-                async with httpx.AsyncClient(timeout=90) as client:
-                    resp = await client.post(
-                        self._endpoint,
-                        headers={
-                            "api-key": self._api_key,
-                            "Content-Type": "application/json",
-                        },
-                        json=payload,
-                    )
-                    if resp.status_code == 429 or resp.status_code >= 500:
-                        wait = 2 ** attempt
-                        await asyncio.sleep(wait)
-                        last_exc = httpx.HTTPStatusError(
-                            f"HTTP {resp.status_code}", request=resp.request, response=resp
-                        )
-                        continue
-                    resp.raise_for_status()
-                    body = resp.json()
-                    content = body["choices"][0]["message"]["content"]
-                    usage = body.get("usage", {})
-                    in_tok = usage.get("prompt_tokens", 0)
-                    out_tok = usage.get("completion_tokens", 0)
-                    if self._inter_call_delay > 0 and attempt == 0:
-                        await asyncio.sleep(self._inter_call_delay)
-                    return content, in_tok, out_tok
-            except (httpx.TimeoutException, httpx.ConnectError) as exc:
+                msg = await self._client.messages.create(
+                    model=self._model,
+                    max_tokens=1024,
+                    system=SYSTEM_PROMPT,
+                    messages=[{"role": "user", "content": user_prompt}],
+                )
+                content = msg.content[0].text
+                in_tok = msg.usage.input_tokens
+                out_tok = msg.usage.output_tokens
+                if self._inter_call_delay > 0:
+                    await asyncio.sleep(self._inter_call_delay)
+                return content, in_tok, out_tok
+            except anthropic.RateLimitError as exc:
                 last_exc = exc
                 await asyncio.sleep(2 ** attempt)
+            except anthropic.APIStatusError as exc:
+                if exc.status_code >= 500:
+                    last_exc = exc
+                    await asyncio.sleep(2 ** attempt)
+                else:
+                    raise
 
         raise RuntimeError(f"API call failed after {self._max_retries} retries") from last_exc
 
