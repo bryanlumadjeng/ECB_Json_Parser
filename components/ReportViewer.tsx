@@ -15,6 +15,15 @@ interface Finding {
   recommendation: string | null;
 }
 
+interface ChapterEvaluation {
+  chapter: string;
+  zone: string;
+  paragraph_ids: number[];
+  verdict: string;
+  confidence: string;
+  finding_id?: string;
+}
+
 interface Summary {
   overall_verdict: string;
   compliant: number;
@@ -31,6 +40,7 @@ export interface Report {
   scope: { tags: string[]; chapters_evaluated: number; chapters_skipped: number };
   summary: Summary;
   findings: Finding[];
+  chapter_evaluations: ChapterEvaluation[];
   token_usage: { input_tokens: number; output_tokens: number; estimated_cost_usd: number };
 }
 
@@ -93,6 +103,38 @@ export default function ReportViewer({ report, onReset }: Props) {
     URL.revokeObjectURL(url);
   };
 
+  const downloadExcel = async () => {
+    const XLSX = await import("xlsx");
+
+    // Build lookup: chapter name → finding details (only missing/partial have these)
+    const findingByChapter = new Map(report.findings.map(f => [f.ecb_chapter, f]));
+
+    const rows = report.chapter_evaluations.map(ce => {
+      const f = findingByChapter.get(ce.chapter);
+      return {
+        "Section": ce.chapter,
+        "Zone": ce.zone.replace(/_/g, " "),
+        "Paragraph IDs": ce.paragraph_ids.join(", "),
+        "Verdict": ce.verdict,
+        "Confidence": ce.confidence,
+        "ECB Requirement Summary": f?.ecb_requirement_summary ?? "",
+        "Gap Description": f?.gap_description ?? "",
+        "Evidence Found": f?.matched_excerpts?.[0] ?? "",
+        "Recommendation": f?.recommendation ?? "",
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws["!cols"] = [
+      { wch: 42 }, { wch: 20 }, { wch: 18 }, { wch: 14 }, { wch: 12 },
+      { wch: 52 }, { wch: 52 }, { wch: 52 }, { wch: 52 },
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Evaluation");
+    XLSX.writeFile(wb, `${report.report_id}.xlsx`);
+  };
+
   const missing = report.findings.filter(f => f.verdict === "missing");
   const partial = report.findings.filter(f => f.verdict === "partial");
 
@@ -108,6 +150,7 @@ export default function ReportViewer({ report, onReset }: Props) {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={downloadExcel} style={styles.btnSecondary}>Download Excel</button>
           <button onClick={downloadJson} style={styles.btnSecondary}>Download JSON</button>
           <button onClick={onReset} style={styles.btnPrimary}>New Evaluation</button>
         </div>
