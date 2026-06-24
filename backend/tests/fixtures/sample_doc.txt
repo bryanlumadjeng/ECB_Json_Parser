@@ -1,0 +1,84 @@
+INTERNAL RATINGS-BASED (IRB) MODEL DOCUMENTATION
+Credit Risk Models — Version 2.1
+
+1. SCOPE AND OVERVIEW
+
+This document covers the internal model approach for credit risk under the IRB framework
+as implemented by the institution. The IRB approach is applied to retail and corporate
+exposures. Probability of Default (PD), Loss Given Default (LGD), and Exposure at
+Default (EAD) estimates are produced by internal models and used in regulatory capital
+calculations.
+
+2. GOVERNANCE AND INTERNAL VALIDATION
+
+The model development team is organizationally separate from the risk validation unit.
+The validation function reports to the Chief Risk Officer and has independent budget
+authority. Validation activities are documented in validation reports reviewed by the
+Model Risk Committee quarterly.
+
+Internal audit reviews the IRB framework annually. Audit findings are tracked and
+remediation timelines are agreed with model owners. The last audit found no critical
+deficiencies in the PD models.
+
+3. DATA GOVERNANCE
+
+Historical data covering at least 5 years of default observations is maintained in the
+model data warehouse. Data quality checks are performed monthly including completeness,
+accuracy, and consistency checks. Reference data sets are versioned and frozen at each
+calibration cycle.
+
+The institution uses both internal data and pooled external data from a consortium for
+low-default portfolios. Data representativeness is assessed annually.
+
+4. PD MODEL — CORPORATE EXPOSURES
+
+The PD model for corporate exposures uses a logistic regression framework with
+financial ratio inputs: leverage ratio, interest coverage, profitability, and liquidity.
+Ratings are mapped to one-year PD estimates via a calibration curve. The calibration
+is validated annually against observed default rates over a 10-year reference period.
+
+Long-run average default rates are computed as simple averages across economic cycles.
+Downturn adjustments are applied where the long-run average is below the through-the-cycle
+estimate. MoC (Margin of Conservatism) is added to account for data limitations.
+
+5. LGD ESTIMATION
+
+LGD estimates are based on workout recoveries from resolved defaults in the institution's
+history. Downturn LGD is calibrated using an economic indicator approach aligned with the
+institution's historical loss experience during the 2008-2010 downturn period.
+
+Collateral haircuts are applied based on forced-sale value estimates. LGD for unsecured
+exposures is set at the observed average for the relevant portfolio segment.
+
+6. EAD AND CONVERSION FACTORS
+
+Conversion factors (CF) for revolving credit facilities are estimated from internal data.
+The reference data set covers 7 years of drawdown observations prior to default events.
+CFs are validated against out-of-sample data each calibration year.
+
+7. MODEL USE AND INTEGRATION
+
+IRB estimates are used in ICAAP, pricing, provisioning, and limit-setting processes.
+The use test is documented and evidenced through management reporting packs that include
+PD-banded portfolio views presented to the Credit Committee monthly.
+
+8. CHANGE MANAGEMENT
+
+Material changes to models are subject to the Model Change Policy. Changes are classified
+as major, moderate, or minor. Major changes require pre-implementation validation and
+regulatory notification. A model change register is maintained with details of all changes
+since initial approval.
+
+9. REVIEW AND BACKTESTING
+
+Annual performance reviews cover discriminatory power (Gini, AUC), calibration (Hosmer-
+Lemeshow test, traffic light approach), and stability (Population Stability Index). Results
+are documented in annual model performance reports submitted to the Model Risk Committee.
+
+Backtesting of PD estimates uses the traffic light approach per EBA guidelines with
+amber and red triggers leading to management actions.
+
+10. RETURN TO NON-DEFAULTED STATUS
+
+The institution applies a 3-month probation period before an obligor may return to
+non-defaulted status. Re-default rates are monitored annually.
