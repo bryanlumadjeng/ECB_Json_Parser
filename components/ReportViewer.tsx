@@ -24,7 +24,7 @@ interface Summary {
   compliance_score: number;
 }
 
-interface Report {
+export interface Report {
   report_id: string;
   generated_at: string;
   bank_document: { path: string; size_bytes: number; chunks: number };

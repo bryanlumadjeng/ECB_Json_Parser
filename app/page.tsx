@@ -3,13 +3,13 @@
 import { useState } from "react";
 import UploadForm from "@/components/UploadForm";
 import ProgressTracker from "@/components/ProgressTracker";
-import ReportViewer from "@/components/ReportViewer";
+import ReportViewer, { Report } from "@/components/ReportViewer";
 
 type AppState = "upload" | "processing" | "results" | "error";
 
 export default function Home() {
   const [state, setState] = useState<AppState>("upload");
-  const [report, setReport] = useState<unknown>(null);
+  const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (formData: FormData) => {
@@ -70,7 +70,7 @@ export default function Home() {
         {state === "processing" && <ProgressTracker />}
 
         {state === "results" && report && (
-          <ReportViewer report={report as Parameters<typeof ReportViewer>[0]["report"]} onReset={reset} />
+          <ReportViewer report={report} onReset={reset} />
         )}
 
         {state === "error" && (
